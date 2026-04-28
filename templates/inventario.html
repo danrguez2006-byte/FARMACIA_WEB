@@ -1,0 +1,223 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="text-3xl font-extrabold text-slate-800 mb-6">Inventario</h1>
+
+<div class="grid md:grid-cols-2 gap-6 mb-8">
+
+  <!-- NUEVO PRODUCTO -->
+  <div class="bg-white p-6 rounded-2xl shadow">
+    <h2 class="font-bold text-xl mb-4">Nuevo Producto</h2>
+
+    <input id="nombre"
+      placeholder="Nombre del producto"
+      class="w-full border p-3 mb-3 rounded-lg">
+
+    <input id="precio"
+      placeholder="Precio"
+      type="number"
+      step="0.01"
+      class="w-full border p-3 mb-3 rounded-lg">
+
+    <input id="imagen"
+      placeholder="URL de imagen del producto"
+      class="w-full border p-3 mb-3 rounded-lg">
+
+    <button onclick="agregarProducto()"
+      class="bg-green-600 text-white w-full p-3 rounded-lg hover:bg-green-700 font-semibold">
+      Guardar Producto
+    </button>
+  </div>
+
+  <!-- NUEVO LOTE -->
+  <div class="bg-white p-6 rounded-2xl shadow">
+    <h2 class="font-bold text-xl mb-4">Nuevo Lote</h2>
+
+    <select id="producto_id"
+      class="w-full border p-3 mb-3 rounded-lg">
+    </select>
+
+    <input id="lote"
+      placeholder="Número de lote"
+      class="w-full border p-3 mb-3 rounded-lg">
+
+    <input id="stock"
+      placeholder="Stock"
+      type="number"
+      class="w-full border p-3 mb-3 rounded-lg">
+
+    <input id="caducidad"
+      type="date"
+      class="w-full border p-3 mb-3 rounded-lg">
+
+    <button onclick="agregarLote()"
+      class="bg-blue-600 text-white w-full p-3 rounded-lg hover:bg-blue-700 font-semibold">
+      Guardar Lote
+    </button>
+  </div>
+
+</div>
+
+<!-- TABLA -->
+<div class="bg-white p-6 rounded-2xl shadow">
+
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="font-bold text-xl">Lista de Productos</h2>
+
+    <input id="buscar"
+      placeholder="Buscar producto..."
+      class="border p-2 rounded-lg">
+  </div>
+
+  <table class="w-full text-sm">
+
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="p-3 text-left">Imagen</th>
+        <th class="p-3 text-left">ID</th>
+        <th class="p-3 text-left">Nombre</th>
+        <th class="p-3 text-left">Precio</th>
+        <th class="p-3 text-left">Stock</th>
+      </tr>
+    </thead>
+
+    <tbody id="tabla"></tbody>
+
+  </table>
+
+</div>
+
+<script>
+let productos = [];
+
+function cargar(){
+
+  fetch("/api/productos")
+  .then(r => r.json())
+  .then(data => {
+    productos = data;
+    render(data);
+    llenarSelect(data);
+  });
+
+}
+
+function render(data){
+
+  let html = "";
+
+  data.forEach(p => {
+
+    html += `
+    <tr class="border-b hover:bg-gray-50">
+
+      <td class="p-3">
+        <img src="${p.imagen}"
+          class="w-16 h-16 object-cover rounded-lg"
+          onerror="this.src='https://images.unsplash.com/photo-1587854692152-cbe660dbde88'">
+      </td>
+
+      <td class="p-3">${p.id}</td>
+
+      <td class="p-3 font-semibold">${p.nombre}</td>
+
+      <td class="p-3">$${Number(p.precio).toFixed(2)}</td>
+
+      <td class="p-3">${p.stock}</td>
+
+    </tr>
+    `;
+
+  });
+
+  tabla.innerHTML = html;
+}
+
+function llenarSelect(data){
+
+  let html = "";
+
+  data.forEach(p => {
+    html += `
+    <option value="${p.id}">
+      ${p.nombre}
+    </option>`;
+  });
+
+  producto_id.innerHTML = html;
+}
+
+buscar.oninput = () => {
+
+  let texto = buscar.value.toLowerCase();
+
+  let filtrado = productos.filter(p =>
+    p.nombre.toLowerCase().includes(texto)
+  );
+
+  render(filtrado);
+};
+
+function agregarProducto(){
+
+  fetch("/api/productos",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      nombre:nombre.value,
+      precio:precio.value,
+      imagen:imagen.value
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+
+    if(d.ok){
+      nombre.value = "";
+      precio.value = "";
+      imagen.value = "";
+      cargar();
+    }else{
+      alert(d.error);
+    }
+
+  });
+
+}
+
+function agregarLote(){
+
+  fetch("/api/lotes",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      producto_id:producto_id.value,
+      lote:lote.value,
+      stock:stock.value,
+      caducidad:caducidad.value
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+
+    if(d.ok){
+      lote.value = "";
+      stock.value = "";
+      caducidad.value = "";
+      cargar();
+    }else{
+      alert(d.error);
+    }
+
+  });
+
+}
+
+cargar();
+</script>
+
+{% endblock %}

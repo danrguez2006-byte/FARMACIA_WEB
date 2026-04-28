@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmaKit Pro</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-slate-50">
+
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="w-72 bg-gradient-to-b from-slate-950 to-blue-950 text-white p-6 fixed md:static h-full z-20 transform -translate-x-full md:translate-x-0 transition">
+
+    <!-- BRAND -->
+    <div class="flex items-center gap-3 mb-12">
+      <img src="/static/logo1.png"
+        class="w-16 h-16 object-contain rounded-full">
+
+      <div>
+        <h1 class="text-2xl font-extrabold leading-tight">
+          Farma<span class="text-green-400">Kit</span> Pro
+        </h1>
+        <p class="text-sm italic text-slate-200 leading-tight">
+          Tu aliado en cada<br>emergencia
+        </p>
+      </div>
+    </div>
+
+    <nav class="space-y-5 text-lg">
+
+      {% if session["rol"] == "admin" or session["rol"] == "vendedor" %}
+      <a href="/dashboard" class="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-700/60">
+        <i class="fa fa-chart-line w-6"></i> Dashboard
+      </a>
+
+      <a href="/inventario" class="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-700/60">
+        <i class="fa fa-pills w-6"></i> Inventario
+      </a>
+      {% endif %}
+
+      {% if session["rol"] == "admin" or session["rol"] == "cajero" %}
+      <a href="/ventas" class="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-700/60">
+        <i class="fa fa-cash-register w-6"></i> Ventas
+      </a>
+      {% endif %}
+
+      {% if session["rol"] == "admin" %}
+      <a href="/reporte" class="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-700/60">
+        <i class="fa fa-file-lines w-6"></i> Reportes
+      </a>
+
+      <a href="/usuarios" class="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-700/60">
+        <i class="fa fa-users w-6"></i> Usuarios
+      </a>
+      {% endif %}
+
+      {% if session["rol"] == "cliente" %}
+      <a href="/cliente" class="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-700/60">
+        <i class="fa fa-store w-6"></i> Tienda
+      </a>
+
+      <a href="/mis-pedidos" class="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-700/60">
+        <i class="fa fa-truck w-6"></i> Mis Pedidos
+      </a>
+      {% endif %}
+
+      <hr class="border-slate-700 my-8">
+
+      <a href="/logout" class="flex items-center gap-4 p-3 rounded-xl hover:bg-red-700/70">
+        <i class="fa fa-right-from-bracket w-6 text-red-400"></i> Cerrar sesión
+      </a>
+
+    </nav>
+
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- TOPBAR -->
+    <header class="bg-white shadow-sm px-10 py-5 flex justify-between items-center">
+
+      <button onclick="toggleSidebar()" class="md:hidden text-xl">☰</button>
+
+      <div class="flex items-center gap-4">
+        <img src="/static/logo1.png"
+          class="w-14 h-14 object-contain rounded-full">
+
+        <h2 class="text-4xl font-extrabold text-blue-700">
+          Farma<span class="text-green-600">Kit</span> Pro
+        </h2>
+
+        <div class="h-10 border-l border-gray-300 mx-2"></div>
+
+        <p class="text-2xl italic text-slate-600">
+          Tu aliado en cada emergencia
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center">
+          <i class="fa fa-user text-2xl"></i>
+        </div>
+        <div>
+          <p class="font-bold">Usuario</p>
+          <p class="text-sm text-gray-500">Rol: {{ session["rol"] }}</p>
+        </div>
+      </div>
+
+    </header>
+
+    <main class="p-10 overflow-auto bg-slate-50">
+      {% block content %}{% endblock %}
+    </main>
+
+  </div>
+
+</div>
+
+<script>
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("-translate-x-full");
+}
+</script>
+
+</body>
+</html>

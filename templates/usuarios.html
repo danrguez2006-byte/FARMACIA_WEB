@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Usuarios</h1>
+
+<div class="grid md:grid-cols-2 gap-4">
+
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold mb-3">Crear Usuario</h2>
+
+    <input id="nombre" placeholder="Nombre" class="w-full border p-2 mb-2 rounded">
+
+    <input id="email" placeholder="Correo" class="w-full border p-2 mb-2 rounded">
+
+    <input id="password" placeholder="Contraseña" type="password" class="w-full border p-2 mb-2 rounded">
+
+    <select id="rol" class="w-full border p-2 mb-3 rounded">
+      <option value="admin">admin</option>
+      <option value="vendedor">vendedor</option>
+      <option value="cajero">cajero</option>
+      <option value="cliente">cliente</option>
+    </select>
+
+    <button onclick="crear()" class="bg-green-600 text-white w-full p-2 rounded hover:bg-green-700">
+      Crear Usuario
+    </button>
+  </div>
+
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold mb-3">Lista de Usuarios</h2>
+    <div id="tabla"></div>
+  </div>
+
+</div>
+
+<script>
+function cargar(){
+  fetch("/api/usuarios")
+  .then(r => r.json())
+  .then(data => {
+    let html = "";
+
+    data.forEach(u => {
+      html += `
+        <div class="flex justify-between items-center border-b py-2">
+          <div>
+            <p class="font-semibold">${u.nombre}</p>
+            <p class="text-sm text-gray-500">${u.email}</p>
+            <p class="text-xs text-blue-600">${u.rol}</p>
+          </div>
+
+          <button onclick="eliminarUsuario(${u.id})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+            Eliminar
+          </button>
+        </div>
+      `;
+    });
+
+    tabla.innerHTML = html;
+  });
+}
+
+function crear(){
+  fetch("/api/usuarios",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      nombre:nombre.value,
+      email:email.value,
+      password:password.value,
+      rol:rol.value
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if(d.ok){
+      nombre.value = "";
+      email.value = "";
+      password.value = "";
+      cargar();
+    }else{
+      alert("Error al crear usuario");
+    }
+  });
+}
+
+function eliminarUsuario(id){
+  if(!confirm("¿Eliminar usuario?")){
+    return;
+  }
+
+  fetch("/api/usuarios/" + id,{
+    method:"DELETE"
+  })
+  .then(r => r.json())
+  .then(d => {
+    cargar();
+  });
+}
+
+cargar();
+</script>
+
+{% endblock %}

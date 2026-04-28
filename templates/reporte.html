@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Historial de Ventas</h1>
+
+<div class="bg-white p-4 rounded shadow">
+
+  <table class="w-full text-sm">
+
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="p-2 text-left">ID</th>
+        <th class="p-2 text-left">Fecha</th>
+        <th class="p-2 text-left">Usuario</th>
+        <th class="p-2 text-left">Total</th>
+      </tr>
+    </thead>
+
+    <tbody id="tabla"></tbody>
+
+  </table>
+
+</div>
+
+<script>
+fetch("/api/historial")
+.then(r=>r.json())
+.then(data=>{
+
+  let html = "";
+
+  data.forEach(v=>{
+
+    html += `
+    <tr class="border-b">
+      <td class="p-2">${v.id}</td>
+      <td class="p-2">${v.fecha}</td>
+      <td class="p-2">${v.usuario}</td>
+      <td class="p-2">$${Number(v.total).toFixed(2)}</td>
+    </tr>
+    `;
+
+  });
+
+  tabla.innerHTML = html;
+
+});
+</script>
+
+{% endblock %}

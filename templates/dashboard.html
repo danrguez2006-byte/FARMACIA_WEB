@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="text-4xl font-extrabold text-slate-800 mb-8">Dashboard</h1>
+
+<div class="grid md:grid-cols-3 gap-8 mb-8">
+
+  <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-6">
+    <div class="w-20 h-20 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center">
+      <i class="fa fa-cart-shopping text-4xl"></i>
+    </div>
+    <div>
+      <p class="text-gray-500 text-lg">Ventas Hoy</p>
+      <h2 id="ventas" class="text-4xl font-extrabold text-green-700">$0.00</h2>
+      <p class="text-gray-400">Ingresos del día</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-6">
+    <div class="w-20 h-20 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+      <i class="fa fa-box text-4xl"></i>
+    </div>
+    <div>
+      <p class="text-gray-500 text-lg">Productos</p>
+      <h2 id="productos" class="text-4xl font-extrabold text-blue-700">0</h2>
+      <p class="text-gray-400">Total en inventario</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-6">
+    <div class="w-20 h-20 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center">
+      <i class="fa fa-users text-4xl"></i>
+    </div>
+    <div>
+      <p class="text-gray-500 text-lg">Usuarios</p>
+      <h2 id="usuarios" class="text-4xl font-extrabold text-purple-700">0</h2>
+      <p class="text-gray-400">Usuarios registrados</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="bg-white rounded-2xl shadow p-8">
+  <h2 class="text-2xl font-bold mb-6 text-slate-800">
+    Ventas de los últimos días
+  </h2>
+  <canvas id="chart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+fetch("/api/resumen")
+.then(r=>r.json())
+.then(data=>{
+  ventas.innerText = "$" + Number(data.ventas).toFixed(2);
+  productos.innerText = data.productos;
+  usuarios.innerText = data.usuarios;
+});
+
+fetch("/api/ventas-dia")
+.then(r=>r.json())
+.then(data=>{
+
+new Chart(document.getElementById("chart"),{
+  type:"line",
+  data:{
+    labels:data.labels,
+    datasets:[{
+      label:"Ventas",
+      data:data.valores,
+      borderWidth:3,
+      tension:0.4,
+      fill:false
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      legend:{
+        display:true
+      }
+    },
+    scales:{
+      y:{
+        beginAtZero:true
+      }
+    }
+  }
+});
+
+});
+</script>
+
+{% endblock %}

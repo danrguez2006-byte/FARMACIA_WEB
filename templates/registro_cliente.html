@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Cliente</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="bg-white p-8 rounded-xl shadow-xl w-96">
+
+  <h1 class="text-3xl font-bold text-center mb-6">
+    💊 Crear cuenta
+  </h1>
+
+  <input id="nombre" placeholder="Nombre completo" class="w-full border p-2 mb-3 rounded">
+
+  <input id="email" placeholder="Correo electrónico" class="w-full border p-2 mb-3 rounded">
+
+  <input id="password" type="password" placeholder="Contraseña" class="w-full border p-2 mb-3 rounded">
+
+  <button onclick="registrar()" class="bg-green-600 text-white w-full p-2 rounded hover:bg-green-700">
+    Registrarme
+  </button>
+
+  <p id="mensaje" class="text-center text-sm mt-3"></p>
+
+  <p class="text-center text-sm mt-4">
+    ¿Ya tienes cuenta?
+    <a href="/" class="text-blue-600 font-semibold">Inicia sesión</a>
+  </p>
+
+</div>
+
+<script>
+function registrar(){
+  fetch("/api/registro-cliente",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      nombre:nombre.value,
+      email:email.value,
+      password:password.value
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if(d.ok){
+      alert("Registro exitoso. Ahora inicia sesión.");
+      window.location = "/";
+    }else{
+      mensaje.innerText = d.error;
+      mensaje.className = "text-red-500 text-center text-sm mt-3";
+    }
+  });
+}
+</script>
+
+</body>
+</html>
