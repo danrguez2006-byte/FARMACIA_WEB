@@ -1,26 +1,36 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h1 class="text-2xl font-bold mb-4">Mis Pedidos</h1>
+<h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-6">
+  Mis Pedidos
+</h1>
 
-<div class="bg-white p-4 rounded shadow">
+<div class="bg-white p-4 md:p-6 rounded-2xl shadow">
 
-<table class="w-full text-sm">
+  <!-- VISTA EN CELULAR -->
+  <div id="pedidosMovil" class="space-y-4 md:hidden"></div>
 
-  <thead class="bg-gray-200">
-    <tr>
-      <th class="p-2 text-left">Pedido</th>
-      <th class="p-2 text-left">Fecha</th>
-      <th class="p-2 text-left">Total</th>
-      <th class="p-2 text-left">Estado</th>
-      <th class="p-2 text-left">Teléfono</th>
-      <th class="p-2 text-left">Dirección</th>
-    </tr>
-  </thead>
+  <!-- VISTA EN COMPUTADORA -->
+  <div class="hidden md:block overflow-x-auto">
 
-  <tbody id="tabla"></tbody>
+    <table class="w-full text-sm">
 
-</table>
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="p-3 text-left">Pedido</th>
+          <th class="p-3 text-left">Fecha</th>
+          <th class="p-3 text-left">Total</th>
+          <th class="p-3 text-left">Estado</th>
+          <th class="p-3 text-left">Teléfono</th>
+          <th class="p-3 text-left">Dirección</th>
+        </tr>
+      </thead>
+
+      <tbody id="tabla"></tbody>
+
+    </table>
+
+  </div>
 
 </div>
 
@@ -28,26 +38,86 @@
 fetch("/api/mis-pedidos")
 .then(r => r.json())
 .then(data => {
-  let html = "";
+
+  let htmlTabla = "";
+  let htmlMovil = "";
+
+  if(data.length === 0){
+    htmlMovil = `
+      <div class="text-center text-gray-500 py-8">
+        No tienes pedidos todavía.
+      </div>
+    `;
+
+    htmlTabla = `
+      <tr>
+        <td colspan="6" class="p-6 text-center text-gray-500">
+          No tienes pedidos todavía.
+        </td>
+      </tr>
+    `;
+  }
 
   data.forEach(p => {
-    html += `
+
+    htmlTabla += `
       <tr class="border-b">
-        <td class="p-2">#${p.id}</td>
-        <td class="p-2">${p.fecha}</td>
-        <td class="p-2">$${Number(p.total).toFixed(2)}</td>
-        <td class="p-2">
-          <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
+        <td class="p-3 font-semibold">#${p.id}</td>
+        <td class="p-3">${p.fecha}</td>
+        <td class="p-3 font-bold">$${Number(p.total).toFixed(2)}</td>
+        <td class="p-3">
+          <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
             ${p.estado}
           </span>
         </td>
-        <td class="p-2">${p.telefono}</td>
-        <td class="p-2">${p.direccion}</td>
+        <td class="p-3">${p.telefono}</td>
+        <td class="p-3">${p.direccion}</td>
       </tr>
     `;
+
+    htmlMovil += `
+      <div class="border rounded-2xl p-4 shadow-sm bg-slate-50">
+
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="font-bold text-lg">Pedido #${p.id}</h2>
+
+          <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
+            ${p.estado}
+          </span>
+        </div>
+
+        <div class="space-y-2 text-sm">
+
+          <p>
+            <span class="font-semibold text-gray-600">Fecha:</span>
+            ${p.fecha}
+          </p>
+
+          <p>
+            <span class="font-semibold text-gray-600">Total:</span>
+            <span class="font-bold text-green-700">$${Number(p.total).toFixed(2)}</span>
+          </p>
+
+          <p>
+            <span class="font-semibold text-gray-600">Teléfono:</span>
+            ${p.telefono}
+          </p>
+
+          <p>
+            <span class="font-semibold text-gray-600">Dirección:</span>
+            ${p.direccion}
+          </p>
+
+        </div>
+
+      </div>
+    `;
+
   });
 
-  tabla.innerHTML = html;
+  document.getElementById("tabla").innerHTML = htmlTabla;
+  document.getElementById("pedidosMovil").innerHTML = htmlMovil;
+
 });
 </script>
 
